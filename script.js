@@ -225,7 +225,49 @@ function submitGuess() {
 
   currentRow++;
 }
+#keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 20px auto;
+}
 
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.key {
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.key.correct {
+  background-color: green;
+  color: white;
+}
+
+.key.wrong-position {
+  background-color: orange;
+  color: white;
+}
+
+.key.wrong {
+  background-color: gray;
+  color: white;
+}
 function updateKeyboard(letter, status) {
   const key = document.querySelector(`.key[data-key="${letter}"]`);
   if (key && !key.classList.contains("correct")) {
