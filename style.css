@@ -1,56 +1,37 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin: 20px;
-}
-
-h1 {
-  margin-bottom: 20px;
-}
-
-#game-grid {
-  display: grid; /* Grid layout to organize rows and tiles */
-  grid-template-columns: repeat(5, 50px); /* Five columns per row */
-  gap: 10px; /* Add spacing between rows and tiles */
+#keyboard {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 20px;
+  max-width: 600px;
+  margin: 20px auto;
 }
 
-.tile {
-  width: 50px;
-  height: 50px;
+.key {
+  width: 40px;
+  height: 40px;
+  margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: lightgray;
   border: 1px solid #ccc;
-  font-size: 18px;
+  border-radius: 5px;
   text-transform: uppercase;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.correct {
+.key.correct {
   background-color: green;
   color: white;
 }
 
-.wrong-position {
+.key.wrong-position {
   background-color: orange;
   color: white;
 }
 
-.wrong {
+.key.wrong {
   background-color: gray;
   color: white;
-}
-
-#guess-input {
-  text-align: center;
-  font-size: 16px;
-  padding: 5px;
-  width: 150px;
-}
-
-#submit-btn {
-  padding: 5px 10px;
-  font-size: 16px;
-  cursor: pointer;
 }
