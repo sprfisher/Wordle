@@ -1,5 +1,5 @@
-const words = [
-  "acorn", "adapt", "admin", "adobe", "adult", "after", "agent", "aisle", "alarm", "album",
+const words = ["apple", 
+"acorn", "adapt", "admin", "adobe", "adult", "after", "agent", "aisle", "alarm", "album",
   "alien", "align", "alley", "alpha", "altar", "amber", "amend", "angel", "angle", "ankle",
   "annex", "apple", "arena", "argon", "arise", "armed", "armor", "arrow", "aside", "audio",
   "audit", "avoid", "award", "badge", "baker", "balsa", "basic", "basin", "batch", "beads",
@@ -154,11 +154,34 @@ const words = [
   "vapor", "vault", "verge", "vivid", "vocal", "voice", "vowel", "waste", "watch", "water",
   "weary", "weave", "whale", "wheat", "whirl", "white", "whole", "widow", "wider", "witch",
   "woman", "worry", "world", "worse", "worth", "wound", "wrist", "write", "wrong", "xenon",
-  "yacht", "yield", "young", "youth", "zebra", "zesty", "zesty"
-];
- // Word list
+  "yacht", "yield", "young", "youth", "zebra", "zesty", "zesty", "grape", "peach", "mango", "berry"];
 const solution = words[Math.floor(Math.random() * words.length)];
 let currentRow = 0;
+
+// Initialize the keyboard layout
+const keyboardLayout = [
+  "qwertyuiop",
+  "asdfghjkl",
+  "zxcvbnm"
+];
+
+function createKeyboard() {
+  const keyboardDiv = document.getElementById("keyboard");
+
+  keyboardLayout.forEach(row => {
+    const rowDiv = document.createElement("div");
+    row.split("").forEach(letter => {
+      const key = document.createElement("div");
+      key.classList.add("key");
+      key.setAttribute("data-key", letter);
+      key.textContent = letter;
+      rowDiv.appendChild(key);
+    });
+    keyboardDiv.appendChild(rowDiv);
+  });
+}
+
+createKeyboard();
 
 document.getElementById("submit-btn").addEventListener("click", submitGuess);
 
@@ -171,28 +194,27 @@ function submitGuess() {
     return;
   }
 
-  // Create a new row for the guess
   for (let i = 0; i < 5; i++) {
     const tile = document.createElement("div");
     tile.classList.add("tile");
 
-    // Add feedback coloring
     if (guess[i] === solution[i]) {
       tile.classList.add("correct");
+      updateKeyboard(guess[i], "correct");
     } else if (solution.includes(guess[i])) {
       tile.classList.add("wrong-position");
+      updateKeyboard(guess[i], "wrong-position");
     } else {
       tile.classList.add("wrong");
+      updateKeyboard(guess[i], "wrong");
     }
 
-    // Add letter to the tile
     tile.textContent = guess[i];
     document.getElementById("game-grid").appendChild(tile);
   }
 
   input.value = "";
 
-  // Check for win or lose
   if (guess === solution) {
     displayMessage("Congratulations! You guessed the word!");
     disableInput();
@@ -204,6 +226,13 @@ function submitGuess() {
   currentRow++;
 }
 
+function updateKeyboard(letter, status) {
+  const key = document.querySelector(`.key[data-key="${letter}"]`);
+  if (key && !key.classList.contains("correct")) {
+    key.className = `key ${status}`;
+  }
+}
+
 function displayMessage(message) {
   document.getElementById("message").textContent = message;
 }
@@ -212,3 +241,9 @@ function disableInput() {
   document.getElementById("guess-input").disabled = true;
   document.getElementById("submit-btn").disabled = true;
 }
+
+
+
+
+
+
