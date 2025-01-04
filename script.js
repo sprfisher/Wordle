@@ -427,6 +427,24 @@ const solution = words[Math.floor(Math.random() * words.length)]; // Random word
 let currentRow = 0;
 let currentTile = 0;
 
+// Create an invisible input field for mobile keyboard support
+const inputField = document.createElement("input");
+inputField.type = "text";
+inputField.maxLength = "1";
+inputField.style.position = "absolute";
+inputField.style.opacity = "0";
+document.body.appendChild(inputField);
+
+inputField.addEventListener("input", (e) => {
+  const letter = e.target.value.toLowerCase();
+  e.target.value = ""; // Clear the input field
+  if (/^[a-z]$/.test(letter)) {
+    addLetter(letter);
+  }
+});
+
+document.addEventListener("click", () => inputField.focus());
+
 // Create game board
 function createGameBoard() {
   const gameBoard = document.getElementById("game-board");
@@ -462,19 +480,6 @@ function createKeyboard() {
     keyboardDiv.appendChild(rowDiv);
   });
 }
-
-// Handle key press
-document.addEventListener("keydown", (e) => {
-  const key = e.key.toLowerCase();
-
-  if (/^[a-z]$/.test(key)) {
-    addLetter(key);
-  } else if (key === "enter") {
-    submitGuess();
-  } else if (key === "backspace") {
-    deleteLetter();
-  }
-});
 
 // Add letter to the current tile
 function addLetter(letter) {
