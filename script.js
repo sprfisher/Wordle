@@ -597,24 +597,6 @@ const solution = words[Math.floor(Math.random() * words.length)]; // Random word
 let currentRow = 0;
 let currentTile = 0;
 
-// Create an invisible input field for mobile keyboard support
-const inputField = document.createElement("input");
-inputField.type = "text";
-inputField.maxLength = "1";
-inputField.style.position = "absolute";
-inputField.style.opacity = "0";
-document.body.appendChild(inputField);
-
-inputField.addEventListener("input", (e) => {
-  const letter = e.target.value.toLowerCase();
-  e.target.value = ""; // Clear the input field
-  if (/^[a-z]$/.test(letter)) {
-    addLetter(letter);
-  }
-});
-
-document.addEventListener("click", () => inputField.focus());
-
 // Create game board
 function createGameBoard() {
   const gameBoard = document.getElementById("game-board");
@@ -630,7 +612,7 @@ function createGameBoard() {
   }
 }
 
-// Create keyboard
+// Create on-screen keyboard
 function createKeyboard() {
   const keyboardLayout = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
   const keyboardDiv = document.getElementById("keyboard");
@@ -644,15 +626,34 @@ function createKeyboard() {
       key.classList.add("key");
       key.setAttribute("data-key", letter);
       key.textContent = letter;
+      key.addEventListener("click", () => handleKeyClick(letter)); // Add event listener for clicks
       rowDiv.appendChild(key);
     });
 
     keyboardDiv.appendChild(rowDiv);
   });
+
+  // Add Enter and Backspace keys
+  const extraRow = document.createElement("div");
+  extraRow.classList.add("keyboard-row");
+
+  const enterKey = document.createElement("div");
+  enterKey.classList.add("key");
+  enterKey.textContent = "Enter";
+  enterKey.addEventListener("click", submitGuess);
+  extraRow.appendChild(enterKey);
+
+  const backspaceKey = document.createElement("div");
+  backspaceKey.classList.add("key");
+  backspaceKey.textContent = "Backspace";
+  backspaceKey.addEventListener("click", deleteLetter);
+  extraRow.appendChild(backspaceKey);
+
+  keyboardDiv.appendChild(extraRow);
 }
 
-// Add letter to the current tile
-function addLetter(letter) {
+// Handle key click
+function handleKeyClick(letter) {
   if (currentTile < 5) {
     const rows = document.querySelectorAll(".row");
     const tile = rows[currentRow].children[currentTile];
