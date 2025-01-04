@@ -155,21 +155,34 @@ const words = ["apple",
   "weary", "weave", "whale", "wheat", "whirl", "white", "whole", "widow", "wider", "witch",
   "woman", "worry", "world", "worse", "worth", "wound", "wrist", "write", "wrong", "xenon",
   "yacht", "yield", "young", "youth", "zebra", "zesty", "zesty", "grape", "peach", "mango", "berry"];
-const solution = words[Math.floor(Math.random() * words.length)];
+const solution = words[Math.floor(Math.random() * words.length)]; // Random word selection
 let currentRow = 0;
+let currentTile = 0;
 
-// Initialize the keyboard layout
-const keyboardLayout = [
-  "qwertyuiop",
-  "asdfghjkl",
-  "zxcvbnm"
-];
+// Create game board
+function createGameBoard() {
+  const gameBoard = document.getElementById("game-board");
+  for (let i = 0; i < 6; i++) {
+    const row = document.createElement("div");
+    row.classList.add("row");
+    for (let j = 0; j < 5; j++) {
+      const tile = document.createElement("div");
+      tile.classList.add("tile");
+      row.appendChild(tile);
+    }
+    gameBoard.appendChild(row);
+  }
+}
 
+// Create keyboard
 function createKeyboard() {
+  const keyboardLayout = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
   const keyboardDiv = document.getElementById("keyboard");
 
   keyboardLayout.forEach(row => {
     const rowDiv = document.createElement("div");
+    rowDiv.classList.add("keyboard-row");
+
     row.split("").forEach(letter => {
       const key = document.createElement("div");
       key.classList.add("key");
@@ -177,115 +190,105 @@ function createKeyboard() {
       key.textContent = letter;
       rowDiv.appendChild(key);
     });
+
     keyboardDiv.appendChild(rowDiv);
   });
 }
 
-createKeyboard();
+// Handle key press
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
 
-document.getElementById("submit-btn").addEventListener("click", submitGuess);
-
-function submitGuess() {
-  const input = document.getElementById("guess-input");
-  const guess = input.value.toLowerCase();
-
-  if (guess.length !== 5) {
-    displayMessage("Guess must be 5 letters long!");
-    return;
+  if (/^[a-z]$/.test(key)) {
+    addLetter(key);
+  } else if (key === "enter") {
+    submitGuess();
+  } else if (key === "backspace") {
+    deleteLetter();
   }
+});
 
-  for (let i = 0; i < 5; i++) {
-    const tile = document.createElement("div");
-    tile.classList.add("tile");
+// Add letter to the current tile
+function addLetter(letter) {
+  if (currentTile < 5) {
+    const rows = document.querySelectorAll(".row");
+    const tile = rows[currentRow].children[currentTile];
+    tile.textContent = letter;
+    currentTile++;
+  }
+}
 
-    if (guess[i] === solution[i]) {
-      tile.classList.add("correct");
-      updateKeyboard(guess[i], "correct");
-    } else if (solution.includes(guess[i])) {
-      tile.classList.add("wrong-position");
-      updateKeyboard(guess[i], "wrong-position");
-    } else {
-      tile.classList.add("wrong");
-      updateKeyboard(guess[i], "wrong");
+// Delete the last letter
+function deleteLetter() {
+  if (currentTile > 0) {
+    const rows = document.querySelectorAll(".row");
+    const tile = rows[currentRow].children[currentTile - 1];
+    tile.textContent = "";
+    currentTile--;
+  }
+}
+
+// Submit the guess
+function submitGuess() {
+  if (currentTile === 5) {
+    const rows = document.querySelectorAll(".row");
+    const tiles = rows[currentRow].children;
+    let guess = "";
+
+    for (let tile of tiles) {
+      guess += tile.textContent.toLowerCase();
     }
 
-    tile.textContent = guess[i];
-    document.getElementById("game-grid").appendChild(tile);
-  }
+    if (!words.includes(guess)) {
+      displayMessage("Not a valid word!");
+      return;
+    }
 
-  input.value = "";
+    checkGuess(tiles, guess);
 
-  if (guess === solution) {
-    displayMessage("Congratulations! You guessed the word!");
-    disableInput();
-  } else if (currentRow === 5) {
-    displayMessage(`Game Over! The word was ${solution}.`);
-    disableInput();
-  }
+    if (guess === solution) {
+      displayMessage("Congratulations! You guessed the word!");
+      return;
+    }
 
-  currentRow++;
-}
-#keyboard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  margin: 20px auto;
-}
+    currentRow++;
+    currentTile = 0;
 
-.keyboard-row {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-}
-
-.key {
-  width: 40px;
-  height: 40px;
-  margin: 2px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: lightgray;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  text-transform: uppercase;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.key.correct {
-  background-color: green;
-  color: white;
-}
-
-.key.wrong-position {
-  background-color: orange;
-  color: white;
-}
-
-.key.wrong {
-  background-color: gray;
-  color: white;
-}
-function updateKeyboard(letter, status) {
-  const key = document.querySelector(`.key[data-key="${letter}"]`);
-  if (key && !key.classList.contains("correct")) {
-    key.className = `key ${status}`;
+    if (currentRow === 6) {
+      displayMessage(`Game Over! The word was ${solution}.`);
+    }
   }
 }
 
+// Check the guess
+function checkGuess(tiles, guess) {
+  const solutionArray = solution.split("");
+
+  guess.split("").forEach((letter, index) => {
+    const tile = tiles[index];
+    const key = document.querySelector(`.key[data-key="${letter}"]`);
+
+    if (letter === solutionArray[index]) {
+      tile.classList.add("correct");
+      key.classList.add("correct");
+      solutionArray[index] = null;
+    } else if (solutionArray.includes(letter)) {
+      tile.classList.add("wrong-position");
+      key.classList.add("wrong-position");
+      solutionArray[solutionArray.indexOf(letter)] = null;
+    } else {
+      tile.classList.add("wrong");
+      key.classList.add("wrong");
+    }
+  });
+}
+
+// Display message
 function displayMessage(message) {
-  document.getElementById("message").textContent = message;
+  const messageDiv = document.getElementById("message");
+  messageDiv.textContent = message;
 }
 
-function disableInput() {
-  document.getElementById("guess-input").disabled = true;
-  document.getElementById("submit-btn").disabled = true;
-}
-
-
-
-
-
-
+// Initialize the game
+createGameBoard();
+createKeyboard();
