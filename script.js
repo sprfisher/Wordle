@@ -626,7 +626,7 @@ function createKeyboard() {
       key.classList.add("key");
       key.setAttribute("data-key", letter);
       key.textContent = letter;
-      key.addEventListener("click", () => handleKeyClick(letter)); // Add event listener for clicks
+      key.addEventListener("click", () => handleKeyClick(letter));
       rowDiv.appendChild(key);
     });
 
